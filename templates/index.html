@@ -1,0 +1,244 @@
+{% block content %}
+<html lang="en-us">
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    </head>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <style>
+        body{
+	        font:15px/1.5 Arial, Helvetica,sans-serif;
+        }
+        .center{
+            margin: auto;
+            width: 75%;
+            padding: 10px;
+        }
+        .ninetywidth{
+            margin: auto;
+            width: 90%;
+            padding: 5px;
+        }
+		.spinner-1:before{
+			content: "";
+			box-sizing: border-box;
+			position: absolute;
+			top:50%;
+			left: 50%;
+			height: 60px;
+			width: 60px;
+			margin-top: -30px;
+			margin-left: -30px;
+			border-radius: 50%;
+			border:6px solid transparent;
+			border-top-color: blue;
+			animation: spinner 0.7s linear infinite;
+		}
+        .jumbotron{
+            background-color:lightgreen;
+        }
+        .topbackground{
+            background-color: lightgreen;
+        }
+        .midbackground{
+            background-color: lightblue;
+        }
+        .botbackground{
+            background-color: lightpink;
+        }
+        .bordercolors{
+            border-style: solid;
+            border-color: gray;
+            padding: 10px;
+        }
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            margin: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+		@keyframes spinner {
+			to {
+				transform: rotate(360deg);
+			}
+        }
+		li { background-color:#BDBDBD; }
+		li:nth-child(odd) { background-color:green; }
+    </style>
+    <div class="topbackground">
+    <div class="container center">
+        <div class="text-center">
+            <h1><strong>Prejudice Detection with Natural Language Processing</strong></h3>
+            <p>A tool to determine if certain texts are racist or sexist</p>
+        </div>
+    </div>
+    </div>
+
+    <div class="midbackground">
+    <div class="container center">
+        <form method="POST" action="{{ url_for('analyze')}}" id="myForm">
+            <label><h3><strong>Enter your text below</strong></h3></label>
+            <textarea class="form-control" rows="20" cols="40" name="rawText"></textarea><br>
+            <input type="submit" onclick="myAnalyzer()" value="Submit" class="btn btn-primary">
+            <input type="button" onclick="myFunction()" value="Clear" class="btn btn-dark">
+            <a href="{{url_for('index')}}" type="button" class="btn btn-danger">Reset</a>
+        </form>
+    </div>
+    </div>
+
+    <div class="botbackground">
+    <div class="container center">
+        <div class="row">
+            <div class="col-sm">
+                <h3><strong>Your raw input text</strong></h3>
+                <div class="bordercolors" style="background-color: white;">
+                <!-- Place Raw Text Here --><p> {{rawText}}</p>
+                </div><br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm"><h3><strong>Overall Analysis</strong></h3>
+                <div class="ninetywidth row">
+                    {%if OverAnalysisRacismScore > 0 and OverAnalysisRacismScore >= OverAnalysisGoodScore and OverAnalysisRacismScore >= OverAnalysisSexismScore%}
+                    <div class="col-sm bordercolors" style="background-color: lightcoral;">
+                    {% else %}
+                    <div class="col-sm bordercolors" style="background-color: white;">
+                    {% endif %}
+                        <strong>Overall Racism Analysis</strong><br>
+                        <div class="ninetywidth row">
+                            <div class="col-sm">
+                                <strong>score</strong>
+                            </div>
+                            <div class="col-sm"><p>{{OverAnalysisRacismScore}} %</p></div>
+                        </div>
+                    </div>
+
+                    {%if OverAnalysisSexismScore > 0 and OverAnalysisSexismScore >= OverAnalysisGoodScore and OverAnalysisSexismScore >= OverAnalysisRacismScore%}
+                    <div class="col-sm bordercolors" style="background-color: lightcoral;">
+                    {% else %}
+                    <div class="col-sm bordercolors" style="background-color: white;">
+                    {% endif %}                        <strong>Overall Sexism Analysis</strong><br>
+                        <div class="ninetywidth row">
+                            <div class="col-sm">
+                                <strong>score</strong>
+                            </div>
+                            <div class="col-sm"> {{OverAnalysisSexismScore}} %</div>
+                        </div>
+                    </div>
+                    {%if OverAnalysisGoodScore > OverAnalysisRacismScore and OverAnalysisGoodScore > OverAnalysisSexismScore%}
+                    <div class="col-sm bordercolors" style="background-color: lightgreen;">
+                    {% else %}
+                    <div class="col-sm bordercolors" style="background-color: white;">
+                    {% endif %}                        <strong>Overall Good Analysis</strong><br>
+                        <div class="ninetywidth row">
+                            <div class="col-sm">
+                                <strong>score</strong>
+                            </div>
+                            <div class="col-sm"> {{OverAnalysisGoodScore}} %</div>
+                        </div>
+                    </div>
+                    {%if OverAnalysisGoodScore > OverAnalysisRacismScore and OverAnalysisGoodScore > OverAnalysisSexismScore%}
+                    <div class="col-sm bordercolors" style="background-color: lightgreen;">
+                    {% elif (OverAnalysisRacismScore > 0 and OverAnalysisSexismScore > 0) and (OverAnalysisRacismScore >= OverAnalysisGoodScore or OverAnalysisSexismScore >= OverAnalysisGoodScore)%}
+                    <div class="col-sm bordercolors" style="background-color: lightcoral;">
+                    {% else %}
+                    <div class="col-sm bordercolors" style="background-color: white;">
+                    {% endif %}
+                        <strong>Overall Final Classification</strong><br>
+                        <div class="ninetywidth row">
+                            <div class="col-sm">
+                                <strong>score</strong>
+                            </div>
+                            <div class="col-sm"> {{FinalClassification}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><br>
+        <div class="row">
+            <div class="col-sm"><h3><strong>Individual Sentence Analysis</strong></h3>
+            <div class="ninetywidth row bordercolors" style="background-color: white;">
+                <table class="table table-striped table-hover table-sm">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Sentence</th>
+                        <th scope="col">Racism Score</th>
+                        <th scope="col">Sexism Score</th>
+                        <th scope="col">Good Score</th>
+                        <th scope="col">Final Classification</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for sentence in SentenceAnalysis %}
+                    {%if sentence["Final Classification"] == "sexist" or sentence["Final Classification"] == "racist" %}
+                        <tr style="background-color: lightcoral;">
+                    {% elif sentence["Final Classification"] == "non-racist/sexist" %}
+                        <tr style="background-color: lightgreen;">
+                    {% else %}
+                        <tr style="background-color: white;">
+                    {% endif %}
+                        <th scope="row">{{sentence["id"]}}</th>
+                        <td>{{sentence["Sentence"]}}</td>
+                        <td>{{sentence["Racism"]}} %</td>
+                        <td>{{sentence["Sexism"]}} %</td>
+                        <td>{{sentence["Good"]}} %</td>
+                        <td>{{sentence["Final Classification"]}}</td>
+                      </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div> <br>
+        <div class="row">
+            <h3><strong>Timeline of sentence to Racism, Sexism and Non-Racist/Sexism scores</strong></h3>
+        </div>
+        <div class="ninetywidth row">
+            <h6><strong>Racism Scores Timeline</strong></h6><br>
+        </div>
+        <div class="ninetywidth bordercolors" style="background-color: white;">
+            <img src="./static/images/racism.svg"/>
+        </div><br>
+        <div class="ninetywidth row">
+            <h6><strong>Sexism Scores Timeline</strong></h6><br>
+        </div>
+        <div class="ninetywidth bordercolors" style="background-color: white;">
+            <img src="./static/images/sexism.svg"/>
+        </div><br>
+        <div class="ninetywidth row">
+            <h6><strong>Non-Racism/Sexism Scores Timeline</strong></h6><br>
+        </div>
+        <div class="ninetywidth bordercolors" style="background-color: white;">
+            <img src="./static/images/good.svg"/>
+        </div><br>
+    </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+
+<script>
+
+
+
+    function myFunction() {
+        document.getElementById("myForm").reset();
+    }
+    function myAnalyzer() {
+        document.querySelector(".main div").style.display="none";
+        document.querySelector(".main").classList.add("spinner-1");
+        setTimeout(() =>{
+            document.querySelector(".main").classList.remove("spinner-1")
+            document.querySelector(".main div").style.display="block";
+        },5000);
+    }
+</script>
+{% endblock %}
+</html>
